@@ -17,7 +17,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 export const eventPilotApi = {
   createProject: (projectRequest: string) => request<Project>("/projects", { method: "POST", body: JSON.stringify({ request: projectRequest }) }),
   getProject: (projectId: string) => request<Project>(`/projects/${projectId}`),
-  runProject: (projectId: string) => request<{ project: Project; memoryCount: number }>(`/projects/${projectId}/run`, { method: "POST" }),
+  runProject: (projectId: string) => request<{ project: Project; started: boolean }>(`/projects/${projectId}/run`, { method: "POST" }),
   getMemories: (projectId: string, query?: string) => request<{ total: number; memories: Memory[] }>(`/projects/${projectId}/memories${query ? `?query=${encodeURIComponent(query)}` : ""}`),
   askProject: (projectId: string, question: string) => request<{ answer: string; memoriesUsed: string[] }>(`/projects/${projectId}/chat`, { method: "POST", body: JSON.stringify({ question }) }),
 };

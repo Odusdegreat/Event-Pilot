@@ -13,7 +13,7 @@ export default function LandingPage() {
       <header className="site-nav">
         <Link className="brand" href="/"><span className="brand-mark">E</span><span>eventpilot</span></Link>
         <nav className="site-links" aria-label="Main navigation"><a href="#how-it-works">How it works</a><a href="#memory">Memory layer</a><a href="#built-for">Use cases</a></nav>
-        <Link className="site-nav-cta" href="/dashboard">Open dashboard <span>↗</span></Link>
+        <Link className="site-nav-cta" href="/dashboard">Open dashboard </Link>
       </header>
 
       <section className="site-hero">
@@ -39,7 +39,7 @@ export default function LandingPage() {
 
       <section className="story-section" id="how-it-works">
         <div className="section-intro"><span className="small-label">The EventPilot way</span><h2>One brief in.<br /><em>Complete alignment</em> out.</h2></div>
-        <div className="story-list">{steps.map(([number, title, description]) => <article className="story-step" key={number}><span>{number}</span><div><h3>{title}</h3><p>{description}</p></div><i>↗</i></article>)}</div>
+        <div className="story-list">{steps.map(([number, title, description]) => <article className="story-step" key={number}><span>{number}</span><div><h3>{title}</h3><p>{description}</p></div></article>)}</div>
       </section>
 
       <section className="memory-story" id="memory">
@@ -49,7 +49,7 @@ export default function LandingPage() {
 
       <section className="uses-section" id="built-for"><div className="section-intro"><span className="small-label">Built for the moment before it matters</span><h2>Make a better room.</h2></div><div className="use-grid"><article><span>01</span><h3>Conferences</h3><p>Align programming, logistics, partnerships, and campaigns around the same audience.</p></article><article><span>02</span><h3>Brand events</h3><p>Turn an ambitious launch brief into an experience with every detail connected.</p></article><article><span>03</span><h3>Community gatherings</h3><p>Build momentum with a team that remembers what your people care about.</p></article></div></section>
 
-      <section className="closing"><span className="small-label">Your next event is waiting</span><h2>Give your agents<br />something to <em>remember.</em></h2><Link className="primary-cta" href="/dashboard">Open EventPilot <span>→</span></Link></section>
+      <section className="closing"><span className="small-label">Your next event is waiting</span><h2>Give your agents<br />something to <em>remember.</em></h2><Link className="primary-cta" href="/dashboard">Open EventPilot </Link></section>
       <footer><Link className="brand" href="/"><span className="brand-mark">E</span><span>eventpilot</span></Link><span>Shared memory for event-making teams.</span><span>2026</span></footer>
     </main>
   );

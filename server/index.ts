@@ -5,9 +5,11 @@ import { z } from "zod";
 import { createProject, getProject, getProjectActivities, runProjectWorkflow } from "./src/orchestrator";
 import { getMemoryHealth, recallProjectMemory } from "./src/memory";
 import { answerProjectQuestion } from "./src/agents";
+import { getEventFeed, startEventFeedRefresh } from "./src/events";
 import { config } from "./src/config";
 
 const app = new Hono();
+startEventFeedRefresh();
 const createProjectSchema = z.object({ request: z.string().min(20).max(4_000) });
 const chatSchema = z.object({ question: z.string().min(3).max(2_000) });
 app.use("/*", cors({ origin: config.CORS_ORIGIN, allowMethods: ["GET", "POST", "OPTIONS"] }));
@@ -20,6 +22,7 @@ app.onError((error, c) => {
   return c.json({ error: "The EventPilot server encountered an unexpected error.", detail: safeMessage(error) }, 500);
 });
 
+app.get("/events", (c) => c.json(getEventFeed()));
 app.get("/health", async (c) => {
   try { const memory = await getMemoryHealth(); return c.json({ status: memory.authenticated ? "ok" : "degraded", service: "eventpilot-server", memory }, memory.authenticated ? 200 : 503); }
   catch (error) { logFailure(c.req.method, c.req.path, error); return c.json({ status: "degraded", memory: "unavailable", error: safeMessage(error) }, 503); }
@@ -32,8 +35,12 @@ app.get("/projects/:projectId", (c) => { const project = getProject(c.req.param(
 app.post("/projects/:projectId/run", async (c) => {
   const project = getProject(c.req.param("projectId"));
   if (!project) return c.json({ error: "Project not found." }, 404);
-  if (project.status === "running") return c.json({ error: "This workflow is already running." }, 409);
-  try { return c.json(await runProjectWorkflow(project.id)); } catch (error) { logFailure(c.req.method, c.req.path, error, `workflow=${project.id}`); return c.json({ error: "The agent workflow could not finish.", detail: safeMessage(error) }, 502); }
+  if (project.status === "running") return c.json({ project, started: false }, 202);
+  project.status = "running";
+  try {
+    runProjectWorkflow(project.id).catch((error) => logFailure(c.req.method, c.req.path, error, `workflow=${project.id}`));
+    return c.json({ project, started: true }, 202);
+  } catch (error) { logFailure(c.req.method, c.req.path, error, `workflow=${project.id}`); return c.json({ error: "The agent workflow could not be started.", detail: safeMessage(error) }, 502); }
 });
 app.get("/projects/:projectId/activity", (c) => { const activity = getProjectActivities(c.req.param("projectId")); return activity ? c.json({ activity }) : c.json({ error: "Project not found." }, 404); });
 app.get("/projects/:projectId/memories", async (c) => {
